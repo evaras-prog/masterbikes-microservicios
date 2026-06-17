@@ -1,0 +1,23 @@
+# Compiled
+target/
+*.class
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Spring Boot
+*.log
+spring.log
+
+# Wallet / credenciales (importante: nunca subir esto)
+**/Wallet_*/
