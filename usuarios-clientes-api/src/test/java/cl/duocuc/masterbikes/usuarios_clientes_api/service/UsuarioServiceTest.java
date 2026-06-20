@@ -1,6 +1,8 @@
 package cl.duocuc.masterbikes.usuarios_clientes_api.service;
 
 import cl.duocuc.masterbikes.usuarios_clientes_api.client.ProductoClient;
+import cl.duocuc.masterbikes.usuarios_clientes_api.dto.ApiResponse;
+import cl.duocuc.masterbikes.usuarios_clientes_api.dto.ProductoResponse;
 import cl.duocuc.masterbikes.usuarios_clientes_api.dto.UsuarioRequest;
 import cl.duocuc.masterbikes.usuarios_clientes_api.exception.ConflictException;
 import cl.duocuc.masterbikes.usuarios_clientes_api.exception.ResourceNotFoundException;
@@ -24,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 import java.util.Optional;
+import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 public class UsuarioServiceTest {
@@ -131,5 +134,50 @@ public class UsuarioServiceTest {
 
         //THEN: verificamos que deleteById fue llamado exactamente una vez
         verify(usuarioRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    @DisplayName("actualizarUsuario: actualiza correctamente cuando el usuario existe")
+    void actualizarUsuario_exitoso(){
+        //GIVEN
+        UsuarioRequest request = new UsuarioRequest();
+        request.setRut("12345678K");
+        request.setNombres("Juan Modificado");
+        request.setApellidos("Pérez");
+        request.setCorreo("juan@test.cl");
+        request.setPassword("nueva123");
+        request.setIdTipoUsuario(1L);
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(tipoUsuarioRepository.findById(1L)).thenReturn(Optional.of(tipoUsuario));
+        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
+
+        //WHEN
+        UsuarioResponse resultado = usuarioService.actualizarUsuario(1L, request);
+
+        //THEN
+        assertThat(resultado).isNotNull();
+        verify(usuarioRepository, times(1)).save(any(Usuario.class));
+    }
+
+
+    @Test
+    @DisplayName("obtenerProductoDesdeMicroservicio: retorna producto cuando Feign responde correctamente")
+    void obtenerProductoDesdeMicroservicio_exitoso(){
+        //GIVEN
+        ProductoResponse productoResponse = new ProductoResponse();
+        productoResponse.setIdProducto(1L);
+        productoResponse.setCodigo("BIC-001");
+
+        ApiResponse<ProductoResponse> apiResponse = new ApiResponse<>(200, "OK", false, productoResponse);
+
+        when(productoClient.obtenerProductoPorId(1L)).thenReturn(apiResponse);
+
+        //WHEN
+        ProductoResponse resultado = usuarioService.obtenerProductoDesdeMicroservicio(1L);
+
+        //THEN
+        assertThat(resultado).isNotNull();
+        assertThat(resultado.getCodigo()).isEqualTo("BIC-001");
     }
 }

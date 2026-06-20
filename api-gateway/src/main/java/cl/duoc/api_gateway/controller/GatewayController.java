@@ -1,6 +1,7 @@
 package cl.duoc.api_gateway.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -18,8 +19,11 @@ public class GatewayController {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    private static final String USUARIOS_URI = "http://localhost:8081";
-    private static final String PRODUCTOS_URI = "http://localhost:8082";
+    @Value("${microservicios.usuarios-url}")
+    private String usuariosUrl;
+
+    @Value("${microservicios.productos-url}")
+    private String productosUrl;
 
     // ── Rutas hacia usuarios-clientes-api (puerto 8081) ──────────────────────
 
@@ -27,14 +31,14 @@ public class GatewayController {
     public ResponseEntity<Object> proxyUsuarios(
             HttpServletRequest request,
             @RequestBody(required = false) Object body) {
-        return proxy(request, body, USUARIOS_URI);
+        return proxy(request, body, usuariosUrl);
     }
 
     @RequestMapping({"/api/v1/auth", "/api/v1/auth/**"})
     public ResponseEntity<Object> proxyAuth(
             HttpServletRequest request,
             @RequestBody(required = false) Object body) {
-        return proxy(request, body, USUARIOS_URI);
+        return proxy(request, body, usuariosUrl);
     }
 
     // ── Rutas hacia productos-inventario-api (puerto 8082) ───────────────────
@@ -43,14 +47,14 @@ public class GatewayController {
     public ResponseEntity<Object> proxyProductos(
             HttpServletRequest request,
             @RequestBody(required = false) Object body) {
-        return proxy(request, body, PRODUCTOS_URI);
+        return proxy(request, body, productosUrl);
     }
 
     @RequestMapping({"/api/v1/categorias", "/api/v1/categorias/**"})
     public ResponseEntity<Object> proxyCategorias(
             HttpServletRequest request,
             @RequestBody(required = false) Object body) {
-        return proxy(request, body, PRODUCTOS_URI);
+        return proxy(request, body, productosUrl);
     }
 
     // ── Método genérico de reenvío ────────────────────────────────────────────

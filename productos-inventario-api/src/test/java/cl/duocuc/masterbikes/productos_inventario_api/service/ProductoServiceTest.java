@@ -1,6 +1,7 @@
 package cl.duocuc.masterbikes.productos_inventario_api.service;
 
 import cl.duocuc.masterbikes.productos_inventario_api.client.UsuarioClient;
+import cl.duocuc.masterbikes.productos_inventario_api.dto.ApiResponse;
 import cl.duocuc.masterbikes.productos_inventario_api.dto.ProductoRequest;
 import cl.duocuc.masterbikes.productos_inventario_api.dto.ProductoResponse;
 import cl.duocuc.masterbikes.productos_inventario_api.exception.ConflictException;
@@ -22,7 +23,11 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import cl.duocuc.masterbikes.productos_inventario_api.dto.ApiResponse;
+import cl.duocuc.masterbikes.productos_inventario_api.dto.UsuarioResponse;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductoServiceTest {
@@ -143,5 +148,65 @@ public class ProductoServiceTest {
         assertThatThrownBy(()->productoService.registrarProducto(request))
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("stock 0");
+    }
+
+    @Test
+    @DisplayName("actualizarProducto: actualiza correctamente cuando el producto existe")
+    void actualizarProducto_exitoso(){
+        //GIVEN
+        ProductoRequest request = new ProductoRequest();
+        request.setCodigo("BIC-001");
+        request.setNombre("Trek Marlin 7");
+        request.setMarca("Trek");
+        request.setPrecioVenta(550000.0);
+        request.setDisponibleVenta("S");
+        request.setStock(5);
+        request.setIdCategoria(1L);
+
+        when(productoRepository.findById(1L)).thenReturn(Optional.of(producto));
+        when(categoriaProductoRepository.findById(1L)).thenReturn(Optional.of(categoria));
+        when(productoRepository.save(any(Producto.class))).thenReturn(producto);
+
+        //WHEN
+        ProductoResponse resultado = productoService.actualizarProducto(1L, request);
+
+        //THEN
+        assertThat(resultado).isNotNull();
+        verify(productoRepository, times(1)).save(any(Producto.class));
+    }
+
+    @Test
+    @DisplayName("eliminarProducto: elimina correctamente cuando el producto existe")
+    void eliminarProducto_exitoso(){
+        //GIVEN
+        when(productoRepository.existsById(1L)).thenReturn(true);
+        doNothing().when(productoRepository).deleteById(1L);
+
+        //WHEN
+        productoService.eliminarProducto(1L);
+
+        //THEN
+        verify(productoRepository, times(1)).deleteById(1L);
+    }
+
+
+    @Test
+    @DisplayName("obtenerUsuarioDesdeMicroservicio: retorna usuario cuando Feign responde correctamente")
+    void obtenerUsuarioDesdeMicroservicio_exitoso(){
+        //GIVEN
+        UsuarioResponse usuarioResponse = new UsuarioResponse();
+        usuarioResponse.setIdUsuario(1L);
+        usuarioResponse.setRut("12345678K");
+
+        ApiResponse<UsuarioResponse> apiResponse = new ApiResponse<>(200, "OK", false, usuarioResponse);
+
+        when(usuarioClient.obtenerUsuarioPorId(1L)).thenReturn(apiResponse);
+
+        //WHEN
+        UsuarioResponse resultado = productoService.obtenerUsuarioDesdeMicroservicio(1L);
+
+        //THEN
+        assertThat(resultado).isNotNull();
+        assertThat(resultado.getRut()).isEqualTo("12345678K");
     }
 }

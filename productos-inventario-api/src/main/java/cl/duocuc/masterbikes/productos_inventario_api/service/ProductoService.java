@@ -224,6 +224,7 @@ public class ProductoService {
         response.setDisponibleVenta(producto.getDisponibleVenta());
         response.setDisponibleArriendo(producto.getDisponibleArriendo());
         response.setActivo(producto.getActivo());
+        response.setStock(producto.getStock());
 
         response.setIdCategoria(producto.getCategoriaProducto().getIdCategoria());
         response.setNombreCategoria(producto.getCategoriaProducto().getNombre());
