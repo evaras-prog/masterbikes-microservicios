@@ -1,0 +1,46 @@
+services:
+
+  usuarios-clientes-api:
+    build:
+      context: ./usuarios-clientes-api
+      dockerfile: Dockerfile
+    container_name: usuarios-clientes-api
+    restart: always
+    ports:
+      - "8081:8081"
+    env_file:
+      - ./usuarios-clientes-api/.env
+    environment:
+      TNS_ADMIN: /app/wallet
+    volumes:
+      - ./wallet:/app/wallet:ro
+
+  productos-inventario-api:
+    build:
+      context: ./productos-inventario-api
+      dockerfile: Dockerfile
+    container_name: productos-inventario-api
+    restart: always
+    ports:
+      - "8082:8082"
+    env_file:
+      - ./productos-inventario-api/.env
+    environment:
+      TNS_ADMIN: /app/wallet
+    volumes:
+      - ./wallet:/app/wallet:ro
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      USUARIOS_SERVICE_URL: http://usuarios-clientes-api:8081
+      PRODUCTOS_SERVICE_URL: http://productos-inventario-api:8082
+    depends_on:
+      - usuarios-clientes-api
+      - productos-inventario-api

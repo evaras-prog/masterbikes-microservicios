@@ -21,3 +21,8 @@ spring.log
 
 # Wallet / credenciales (importante: nunca subir esto)
 **/Wallet_*/
+wallet/
+
+# Variables de entorno con credenciales
+.env
+**/.env

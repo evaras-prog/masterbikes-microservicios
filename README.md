@@ -42,7 +42,7 @@ Cliente (Postman/Swagger)
 | POST | /api/v1/usuarios | Registrar nuevo usuario |
 | PUT | /api/v1/usuarios/{id} | Actualizar usuario |
 | DELETE | /api/v1/usuarios/{id} | Eliminar usuario |
-| GET | /api/v1/usuarios/{id}/productos/{idProducto} | Consultar producto desde usuarios-api |
+| GET | /api/v1/usuarios/productos/{idProducto} | Consultar producto desde usuarios-api |
 
 ### productos-inventario-api — Puerto 8082
 
@@ -58,7 +58,7 @@ Cliente (Postman/Swagger)
 | POST | /api/v1/categorias | Registrar nueva categoría |
 | PUT | /api/v1/categorias/{id} | Actualizar categoría |
 | DELETE | /api/v1/categorias/{id} | Eliminar categoría |
-| GET | /api/v1/productos/{id}/usuarios/{idUsuario} | Consultar usuario desde productos-api |
+| GET | /api/v1/productos/usuarios/{idUsuario} | Consultar usuario desde productos-api |
 
 ---
 
@@ -136,7 +136,7 @@ mvn test
 ## Tecnologías utilizadas
 
 - Java 17
-- Spring Boot 3
+- Spring Boot 4
 - Spring Security + JWT
 - Spring Data JPA
 - OpenFeign (comunicación entre microservicios)

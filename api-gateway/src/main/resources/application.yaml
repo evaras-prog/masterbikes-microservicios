@@ -6,5 +6,5 @@ server:
   port: 8080
 
 microservicios:
-  usuarios-url: http://localhost:8081
-  productos-url: http://localhost:8082
+  usuarios-url: ${USUARIOS_SERVICE_URL:http://localhost:8081}
+  productos-url: ${PRODUCTOS_SERVICE_URL:http://localhost:8082}
