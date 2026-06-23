@@ -133,6 +133,54 @@ mvn test
 
 ---
 
+## Ejecutar con Docker
+
+Esta es la forma recomendada para levantar el sistema completo sin configurar Java ni Maven manualmente.
+
+### Requisitos previos
+- Docker Desktop instalado y corriendo
+
+### Pasos
+
+1. Clonar el repositorio (si aún no se tiene):
+   ```bash
+   git clone https://github.com/evaras-prog/masterbikes-microservicios.git
+   cd masterbikes-microservicios
+   ```
+
+2. Crear la carpeta `wallet/` en la raíz del proyecto y copiar ahí los archivos de la Oracle Wallet:
+   ```
+   masterbikes-microservicios/
+   └── wallet/
+       ├── tnsnames.ora
+       ├── cwallet.sso
+       ├── ewallet.p12
+       └── ... (resto de archivos)
+   ```
+   > La carpeta `wallet/` está excluida del repositorio por seguridad. Cada integrante debe copiarla manualmente desde su Wallet de Oracle.
+
+3. Levantar todos los servicios con un solo comando:
+   ```bash
+   docker-compose up --build
+   ```
+
+4. Verificar que los tres contenedores están activos en Docker Desktop o con:
+   ```bash
+   docker ps
+   ```
+
+5. Los servicios quedan disponibles en los mismos puertos:
+   - Gateway: http://localhost:8080
+   - Usuarios: http://localhost:8081
+   - Productos: http://localhost:8082
+
+### Detener el sistema
+```bash
+docker-compose down
+```
+
+---
+
 ## Tecnologías utilizadas
 
 - Java 17
@@ -144,3 +192,4 @@ mvn test
 - Springdoc OpenAPI (Swagger)
 - JUnit 5 + Mockito (pruebas unitarias)
 - Maven
+- Docker / Docker Compose
