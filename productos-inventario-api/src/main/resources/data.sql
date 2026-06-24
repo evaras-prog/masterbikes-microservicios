@@ -33,6 +33,7 @@ CREATE TABLE producto (
                           disponible_venta      CHAR(1) NOT NULL,
                           disponible_arriendo   CHAR(1) NOT NULL,
                           activo                CHAR(1) NOT NULL,
+                          stock                 NUMBER(6) DEFAULT 0 NOT NULL,
                           id_categoria          NUMBER NOT NULL,
 
                           CONSTRAINT pk_producto PRIMARY KEY (id_producto),
@@ -114,6 +115,7 @@ INSERT INTO producto (
     disponible_venta,
     disponible_arriendo,
     activo,
+    stock,
     id_categoria
 ) VALUES (
              'BICI-001',
@@ -126,6 +128,7 @@ INSERT INTO producto (
              'S',
              'S',
              'S',
+             10,
              1
          );
 
@@ -140,6 +143,7 @@ INSERT INTO producto (
     disponible_venta,
     disponible_arriendo,
     activo,
+    stock,
     id_categoria
 ) VALUES (
              'BICI-002',
@@ -152,6 +156,7 @@ INSERT INTO producto (
              'S',
              'S',
              'S',
+             8,
              1
          );
 
@@ -166,6 +171,7 @@ INSERT INTO producto (
     disponible_venta,
     disponible_arriendo,
     activo,
+    stock,
     id_categoria
 ) VALUES (
              'BICI-003',
@@ -178,6 +184,7 @@ INSERT INTO producto (
              'S',
              'S',
              'S',
+             5,
              1
          );
 
@@ -192,6 +199,7 @@ INSERT INTO producto (
     disponible_venta,
     disponible_arriendo,
     activo,
+    stock,
     id_categoria
 ) VALUES (
              'CASCO-001',
@@ -204,6 +212,7 @@ INSERT INTO producto (
              'S',
              'N',
              'S',
+             20,
              2
          );
 
@@ -218,6 +227,7 @@ INSERT INTO producto (
     disponible_venta,
     disponible_arriendo,
     activo,
+    stock,
     id_categoria
 ) VALUES (
              'LUZ-001',
@@ -230,6 +240,7 @@ INSERT INTO producto (
              'S',
              'N',
              'S',
+             15,
              2
          );
 
@@ -244,6 +255,7 @@ INSERT INTO producto (
     disponible_venta,
     disponible_arriendo,
     activo,
+    stock,
     id_categoria
 ) VALUES (
              'REP-001',
@@ -256,6 +268,7 @@ INSERT INTO producto (
              'S',
              'N',
              'S',
+             12,
              3
          );
 
@@ -270,6 +283,7 @@ INSERT INTO producto (
     disponible_venta,
     disponible_arriendo,
     activo,
+    stock,
     id_categoria
 ) VALUES (
              'REP-002',
@@ -282,6 +296,7 @@ INSERT INTO producto (
              'S',
              'N',
              'S',
+             25,
              3
          );
 
@@ -296,6 +311,7 @@ INSERT INTO producto (
     disponible_venta,
     disponible_arriendo,
     activo,
+    stock,
     id_categoria
 ) VALUES (
              'HERR-001',
@@ -308,6 +324,7 @@ INSERT INTO producto (
              'S',
              'N',
              'S',
+             7,
              4
          );
 
