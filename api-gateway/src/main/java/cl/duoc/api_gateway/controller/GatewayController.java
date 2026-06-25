@@ -65,8 +65,13 @@ public class GatewayController {
         String targetUrl = baseUrl + path + (query != null ? "?" + query : "");
 
         // Reenviar headers originales (Authorization, Content-Type, etc.)
+        // Se excluyen Content-Length y Transfer-Encoding para evitar conflictos
+        // al re-serializar el body en el reenvío
         HttpHeaders headers = new HttpHeaders();
         Collections.list(request.getHeaderNames())
+                .stream()
+                .filter(name -> !name.equalsIgnoreCase("content-length")
+                             && !name.equalsIgnoreCase("transfer-encoding"))
                 .forEach(name -> headers.add(name, request.getHeader(name)));
 
         HttpEntity<Object> entity = new HttpEntity<>(body, headers);

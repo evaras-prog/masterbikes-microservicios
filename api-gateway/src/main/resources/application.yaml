@@ -8,3 +8,40 @@ server:
 microservicios:
   usuarios-url: ${USUARIOS_SERVICE_URL:http://localhost:8081}
   productos-url: ${PRODUCTOS_SERVICE_URL:http://localhost:8082}
+
+gateway:
+  rutas:
+    - id: usuarios
+      uri: ${USUARIOS_SERVICE_URL:http://localhost:8081}
+      path: /api/v1/usuarios/**
+    - id: auth
+      uri: ${USUARIOS_SERVICE_URL:http://localhost:8081}
+      path: /api/v1/auth/**
+    - id: productos
+      uri: ${PRODUCTOS_SERVICE_URL:http://localhost:8082}
+      path: /api/v1/productos/**
+    - id: categorias
+      uri: ${PRODUCTOS_SERVICE_URL:http://localhost:8082}
+      path: /api/v1/categorias/**
+
+
+
+
+
+
+
+
+
+
+
+
+#spring:
+#  application:
+#    name: api-gateway
+#
+#server:
+#  port: 8080
+#
+#microservicios:
+#  usuarios-url: ${USUARIOS_SERVICE_URL:http://localhost:8081}
+#  productos-url: ${PRODUCTOS_SERVICE_URL:http://localhost:8082}

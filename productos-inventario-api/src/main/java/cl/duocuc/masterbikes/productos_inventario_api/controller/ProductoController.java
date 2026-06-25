@@ -166,4 +166,22 @@ public class ProductoController {
                 usuario
         ));
     }
+
+    @Operation(summary = "Listar productos activos", description = "Obtiene el listado de productos con estado activo")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Listado obtenido correctamente"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @GetMapping("/activos")
+    public ResponseEntity<ApiResponse<List<ProductoResponse>>> listarProductosActivos() {
+
+        List<ProductoResponse> productos = productoService.listarProductosActivos();
+
+        return ResponseEntity.ok(new ApiResponse<>(
+                HttpStatus.OK.value(),
+                "Productos activos encontrados correctamente",
+                false,
+                productos
+        ));
+    }
 }

@@ -43,6 +43,7 @@ CREATE TABLE usuario (
                          telefono        VARCHAR2(20 CHAR),
                          fecha_registro  DATE NOT NULL,
                          activo          CHAR(1) NOT NULL,
+                         direccion       VARCHAR2(200 CHAR),
                          id_tipo         NUMBER NOT NULL,
                          id_sucursal     NUMBER,
 

@@ -149,7 +149,6 @@ public class UsuarioController {
     }
 
 
-
     @Operation(
             summary = "Obtener producto desde microservicio",
             description = "Consulta un producto en productos-inventario-api usando comunicación entre microservicios (Feign)"
@@ -171,6 +170,20 @@ public class UsuarioController {
                 "Producto obtenido correctamente desde productos-inventario-api",
                 false,
                 producto
+        ));
+    }
+
+
+    @GetMapping("/correo/{correo}")
+    public ResponseEntity<ApiResponse<UsuarioResponse>> obtenerPorCorreo(@PathVariable String correo){
+
+        UsuarioResponse usuario = usuarioService.obtenerPorCorreo(correo);
+
+        return ResponseEntity.ok(new ApiResponse<>(
+                HttpStatus.OK.value(),
+                "Usuario encontrado correctamente",
+                false,
+                usuario
         ));
     }
 }

@@ -32,8 +32,12 @@ public class UsuarioRequest {
     @Size(max = 20, message = "El teléfono no puede superar los 20 caracteres")
     private String telefono;
 
+    @Size(max = 200, message = "La dirección no puede superar los 200 caracteres")
+    private String direccion;
+
     @Pattern(regexp = "S|N", message = "El campo activo solo permite S o N")
     private String activo;
+
 
     @NotNull(message = "El tipo de usuario es obligatorio")
     private Long idTipoUsuario;

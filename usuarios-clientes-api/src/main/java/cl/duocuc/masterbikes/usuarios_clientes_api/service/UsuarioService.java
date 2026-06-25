@@ -95,6 +95,7 @@ public class UsuarioService {
         usuario.setCorreo(request.getCorreo());
         usuario.setPassword(request.getPassword());
         usuario.setTelefono(request.getTelefono());
+        usuario.setDireccion(request.getDireccion());
         usuario.setFechaRegistro(LocalDate.now());
         usuario.setActivo(request.getActivo() == null ? "S" : request.getActivo());
         usuario.setTipoUsuario(tipoUsuario);
@@ -141,6 +142,7 @@ public class UsuarioService {
         usuarioExistente.setCorreo(request.getCorreo());
         usuarioExistente.setPassword(request.getPassword());
         usuarioExistente.setTelefono(request.getTelefono());
+        usuarioExistente.setDireccion(request.getDireccion());
         usuarioExistente.setActivo(request.getActivo() == null ? "S" : request.getActivo());
         usuarioExistente.setTipoUsuario(tipoUsuario);
         usuarioExistente.setIdSucursal(request.getIdSucursal());
@@ -185,6 +187,20 @@ public class UsuarioService {
     }
 
 
+    public UsuarioResponse obtenerPorCorreo(String correo) {
+
+        log.info("Inicio de operación: buscar usuario por correo {}", correo);
+
+        Usuario usuario = usuarioRepository.findByCorreo(correo)
+                .orElseThrow(() -> {
+                    log.warn("Usuario no encontrado con correo {}", correo);
+                    return new ResourceNotFoundException("Usuario no encontrado con correo: " + correo);
+                });
+
+        return convertirAResponse(usuario);
+    }
+
+
     private UsuarioResponse convertirAResponse(Usuario usuario){
 
         return new UsuarioResponse(
@@ -194,6 +210,7 @@ public class UsuarioService {
                 usuario.getApellidos(),
                 usuario.getCorreo(),
                 usuario.getTelefono(),
+                usuario.getDireccion(),
                 usuario.getFechaRegistro(),
                 usuario.getActivo(),
                 usuario.getTipoUsuario().getIdTipoUsuario(),

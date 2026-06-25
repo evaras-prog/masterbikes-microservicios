@@ -49,6 +49,9 @@ public class Usuario {
     @Column(name = "activo", nullable = false, length = 1)
     private String activo;
 
+    @Column(name = "direccion", length = 200)
+    private String direccion;
+
     @ManyToOne
     @JoinColumn(name = "id_tipo", nullable = false)
     private TipoUsuario tipoUsuario;

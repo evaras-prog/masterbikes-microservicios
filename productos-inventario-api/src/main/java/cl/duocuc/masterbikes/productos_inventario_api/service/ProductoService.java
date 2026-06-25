@@ -19,6 +19,7 @@ import cl.duocuc.masterbikes.productos_inventario_api.dto.UsuarioResponse;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -250,5 +251,16 @@ public class ProductoService {
 
         return respuesta.getData();
 
+    }
+
+
+    public List<ProductoResponse> listarProductosActivos(){
+        log.info("Inicio de operación: listar productos activos");
+
+        List<Producto> productos = productoRepository.findByActivo("S");
+
+        return productos.stream()
+                .map(this::convertirAResponse)
+                .collect(Collectors.toList());
     }
 }
