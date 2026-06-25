@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  */
 @Configuration
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class    SecurityConfig {
 
     private final JwtFilter jwtFilter;
 
@@ -34,11 +34,13 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers(
+                                "/api/v1/auth/login",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
                                 "/doc/swagger-ui.html",
-                                "/doc/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/doc/swagger-ui/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

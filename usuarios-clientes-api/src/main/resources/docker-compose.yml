@@ -1,0 +1,15 @@
+services:
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+
+  usuarios-clientes-api:
+    build: ./usuarios-clientes-api
+    ports:
+      - "8081:8081"
+
+  productos-inventario-api:
+    build: ./productos-inventario-api
+    ports:
+      - "8082:8082"
