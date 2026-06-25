@@ -180,4 +180,35 @@ public class UsuarioServiceTest {
         assertThat(resultado).isNotNull();
         assertThat(resultado.getCodigo()).isEqualTo("BIC-001");
     }
+
+
+    @Test
+    @DisplayName("obtenerPorCorreo: retorna el usuario cuando el correo existe")
+    void obtenerPorCorreo_cuandoExiste_retornaUsuario(){
+        //GIVEN
+        when(usuarioRepository.findByCorreo("juan@test.cl")).thenReturn(Optional.of(usuario));
+
+
+        //WHEN
+        UsuarioResponse resultado = usuarioService.obtenerPorCorreo("juan@test.cl");
+
+        //THEN
+        assertThat(resultado.getCorreo()).isEqualTo("juan@test.cl");
+        assertThat(resultado.getNombres()).isEqualTo("Juan");
+        verify(usuarioRepository, times(1)).findByCorreo("juan@test.cl");
+    }
+
+
+    @Test
+    @DisplayName("obtenerPorCorreo: lanza excepción cuando el correo no existe")
+    void obtenerPorCorreo_cuandoNoExiste_lanzaException() {
+        // GIVEN
+        when(usuarioRepository.findByCorreo("noexiste@test.cl")).thenReturn(Optional.empty());
+
+        // THEN
+        assertThatThrownBy(() -> usuarioService.obtenerPorCorreo("noexiste@test.cl"))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("correo");
+    }
 }
+

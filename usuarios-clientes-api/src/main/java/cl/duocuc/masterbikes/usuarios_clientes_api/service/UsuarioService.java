@@ -1,204 +1,259 @@
 package cl.duocuc.masterbikes.usuarios_clientes_api.service;
 
+import cl.duocuc.masterbikes.usuarios_clientes_api.client.ProductoClient;
 import cl.duocuc.masterbikes.usuarios_clientes_api.dto.ApiResponse;
-import cl.duocuc.masterbikes.usuarios_clientes_api.exception.ConflictException;
-import cl.duocuc.masterbikes.usuarios_clientes_api.exception.ResourceNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import cl.duocuc.masterbikes.usuarios_clientes_api.dto.ProductoResponse;
 import cl.duocuc.masterbikes.usuarios_clientes_api.dto.UsuarioRequest;
 import cl.duocuc.masterbikes.usuarios_clientes_api.dto.UsuarioResponse;
+import cl.duocuc.masterbikes.usuarios_clientes_api.exception.ConflictException;
+import cl.duocuc.masterbikes.usuarios_clientes_api.exception.ResourceNotFoundException;
 import cl.duocuc.masterbikes.usuarios_clientes_api.model.TipoUsuario;
 import cl.duocuc.masterbikes.usuarios_clientes_api.model.Usuario;
 import cl.duocuc.masterbikes.usuarios_clientes_api.repository.TipoUsuarioRepository;
 import cl.duocuc.masterbikes.usuarios_clientes_api.repository.UsuarioRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import cl.duocuc.masterbikes.usuarios_clientes_api.client.ProductoClient;
-import cl.duocuc.masterbikes.usuarios_clientes_api.dto.ProductoResponse;
-import feign.FeignException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-@Service
-@RequiredArgsConstructor
-@Transactional
-public class UsuarioService {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-    private static final Logger log = LoggerFactory.getLogger(UsuarioService.class);
 
-    private final UsuarioRepository usuarioRepository;
-    private final TipoUsuarioRepository tipoUsuarioRepository;
-    private final ProductoClient productoClient;
+@ExtendWith(MockitoExtension.class)
+class UsuarioServiceTest {
 
-    @Transactional(readOnly = true)
-    public List<UsuarioResponse> listarUsuarios(){
+    @Mock
+    private UsuarioRepository usuarioRepository;
 
-        log.info("Inicio de operación: listar usuarios");
+    @Mock
+    private TipoUsuarioRepository tipoUsuarioRepository;
 
-        List<Usuario> usuarios = usuarioRepository.findAll();
-        List<UsuarioResponse> respuesta = new ArrayList<>();
+    @Mock
+    private ProductoClient productoClient;
 
-        for(Usuario usuario : usuarios){
-            UsuarioResponse dto = convertirAResponse(usuario);
-            respuesta.add(dto);
-        }
+    @InjectMocks
+    private UsuarioService usuarioService;
 
-        log.info("Proceso exitoso: se listaron {} usuarios", respuesta.size());
+    private Usuario usuario;
+    private TipoUsuario tipoUsuario;
+    private UsuarioRequest request;
 
-        return respuesta;
-    }
+    @BeforeEach
+    void setUp() {
+        tipoUsuario = new TipoUsuario();
+        tipoUsuario.setIdTipoUsuario(1L);
+        tipoUsuario.setNombre("CLIENTE");
+        tipoUsuario.setDescripcion("Cliente regular");
 
-    @Transactional(readOnly = true)
-    public UsuarioResponse obtenerUsuarioPorId(Long id){
-
-        log.info("Inicio de operación: buscar usuario por ID {}", id);
-
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(()->{
-                    log.warn("Búsqueda fallida: no se encontró usuario con ID {}", id);
-                    return new ResourceNotFoundException("Usuario no encontrado");
-                });
-
-        log.info("Proceso exitoso: usuario encontrado con ID {}", id);
-
-        return convertirAResponse(usuario);
-    }
-
-    public UsuarioResponse registrarUsuario(UsuarioRequest request){
-
-        log.info("Inicio de operación: registrar usuario con RUT {}", request.getRut());
-
-        if (usuarioRepository.existsByRut(request.getRut())){
-            log.warn("Registro rechazado: ya existe un usuario con RUT {}", request.getRut());
-            throw new ConflictException("Ya existe un usuario con ese RUT");
-        }
-
-        if (usuarioRepository.existsByCorreo(request.getCorreo())){
-            log.warn("Registro rechazado: ya existe");
-            throw new ConflictException("Ya existe un usuario con ese correo");
-        }
-
-        TipoUsuario tipoUsuario = tipoUsuarioRepository.findById(request.getIdTipoUsuario())
-                .orElseThrow(()->{
-                    log.warn("Registro rechazado: tipo de usuario no encontrado con ID {}", request.getIdTipoUsuario());
-                    return new ResourceNotFoundException("Tipo de usuario no encontrado");
-                });
-
-        Usuario usuario = new Usuario();
-        usuario.setRut(request.getRut());
-        usuario.setNombres(request.getNombres());
-        usuario.setApellidos(request.getApellidos());
-        usuario.setCorreo(request.getCorreo());
-        usuario.setPassword(request.getPassword());
-        usuario.setTelefono(request.getTelefono());
+        usuario = new Usuario();
+        usuario.setIdUsuario(1L);
+        usuario.setRut("11111111-1");
+        usuario.setNombres("Juan");
+        usuario.setApellidos("Pérez");
+        usuario.setCorreo("juan@correo.com");
+        usuario.setPassword("123456");
+        usuario.setTelefono("987654321");
         usuario.setFechaRegistro(LocalDate.now());
-        usuario.setActivo(request.getActivo() == null ? "S" : request.getActivo());
+        usuario.setActivo("S");
         usuario.setTipoUsuario(tipoUsuario);
-        usuario.setIdSucursal(request.getIdSucursal());
+        usuario.setIdSucursal(1L);
 
-        Usuario usuarioGuardado = usuarioRepository.save(usuario);
-
-        log.info("Proceso exitoso: usuario registrado con ID {}", usuarioGuardado.getIdUsuario());
-
-        return convertirAResponse(usuarioGuardado);
+        request = new UsuarioRequest();
+        request.setRut("11111111-1");
+        request.setNombres("Juan");
+        request.setApellidos("Pérez");
+        request.setCorreo("juan@correo.com");
+        request.setPassword("123456");
+        request.setTelefono("987654321");
+        request.setActivo("S");
+        request.setIdTipoUsuario(1L);
+        request.setIdSucursal(1L);
     }
 
-    public UsuarioResponse actualizarUsuario(Long idUsuario, UsuarioRequest request){
+    // ---------- listarUsuarios ----------
 
-        log.info("Inicio de operación: actualizar usuario con ID {}", idUsuario);
+    @Test
+    void listarUsuarios_debeRetornarListaDeUsuarios() {
+        when(usuarioRepository.findAll()).thenReturn(List.of(usuario));
 
-        Usuario usuarioExistente = usuarioRepository.findById(idUsuario)
-                .orElseThrow(()->{
-                    log.warn("Actualización rechazada: no se encontró usuario con ID {}", idUsuario);
-                    return new ResourceNotFoundException("Usuario no encontrado");
-                });
+        List<UsuarioResponse> resultado = usuarioService.listarUsuarios();
 
-        if (!usuarioExistente.getRut().equals(request.getRut())
-                && usuarioRepository.existsByRut(request.getRut())){
-            log.warn("Actualización rechazada: ya existe un usurio con RUT {}", request.getRut());
-            throw new ConflictException("Ya existe un usuario con ese RUT");
-        }
-
-        if (!usuarioExistente.getCorreo().equals(request.getCorreo())
-                && usuarioRepository.existsByCorreo(request.getCorreo())){
-            log.warn("Actualización rechazada: ya existe un usuario con correo {}", request.getCorreo());
-            throw new ConflictException("Ya existe un usuario con ese correo");
-        }
-
-        TipoUsuario tipoUsuario = tipoUsuarioRepository.findById(request.getIdTipoUsuario())
-                .orElseThrow(()-> {
-                    log.warn("Actualización rechazada: tipo de usuario no encontrado con ID {}", request.getIdTipoUsuario());
-                    return new ResourceNotFoundException("Tipo de usuario no encontrado");
-                });
-
-        usuarioExistente.setRut(request.getRut());
-        usuarioExistente.setNombres(request.getNombres());
-        usuarioExistente.setApellidos(request.getApellidos());
-        usuarioExistente.setCorreo(request.getCorreo());
-        usuarioExistente.setPassword(request.getPassword());
-        usuarioExistente.setTelefono(request.getTelefono());
-        usuarioExistente.setActivo(request.getActivo() == null ? "S" : request.getActivo());
-        usuarioExistente.setTipoUsuario(tipoUsuario);
-        usuarioExistente.setIdSucursal(request.getIdSucursal());
-
-        Usuario usuarioActualizado = usuarioRepository.save(usuarioExistente);
-
-        log.info("Proceso exitoso: usuario actualizado con ID {}", usuarioActualizado.getIdUsuario());
-
-        return convertirAResponse(usuarioActualizado);
+        assertEquals(1, resultado.size());
+        assertEquals(usuario.getCorreo(), resultado.get(0).getCorreo());
+        verify(usuarioRepository, times(1)).findAll();
     }
 
-    public void eliminarUsuario(Long id){
+    @Test
+    void listarUsuarios_debeRetornarListaVacia_siNoHayUsuarios() {
+        when(usuarioRepository.findAll()).thenReturn(List.of());
 
-        log.info("Inicio de operación: eliminar usuario con ID {}", id);
+        List<UsuarioResponse> resultado = usuarioService.listarUsuarios();
 
-        if (!usuarioRepository.existsById(id)){
-            log.warn("Eliminación rechazada: no existe usuario con ID {}", id );
-            throw new ResourceNotFoundException("No se puede eliminar: usuario no existe");
-        }
-        usuarioRepository.deleteById(id);
-
-        log.info("Proceso exitoso: usuario eliminado con ID {}", id);
-
+        assertTrue(resultado.isEmpty());
     }
 
+    // ---------- obtenerUsuarioPorId ----------
 
-    @Transactional(readOnly = true)
-    public ProductoResponse obtenerProductoDesdeMicroservicio(Long idProducto){
+    @Test
+    void obtenerUsuarioPorId_debeRetornarUsuario_siExiste() {
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
 
-        log.info("Inicio de operación: consultar producto desde productos-inventario-api con ID {}", idProducto);
+        UsuarioResponse resultado = usuarioService.obtenerUsuarioPorId(1L);
 
-        ApiResponse<ProductoResponse> respuesta = productoClient.obtenerProductoPorId(idProducto);
-
-        if (respuesta == null || respuesta.isError() || respuesta.getData() == null){
-            log.warn("Consulta rechazada: no se pudo obtener producto con ID {}", idProducto);
-            throw new RuntimeException("No se pudo obtener productos desde productos-inventario-api");
-        }
-
-        log.info("Proceso exitoso: producto obtenido desde productos-inventario-api con ID {}", idProducto);
-
-        return respuesta.getData();
+        assertNotNull(resultado);
+        assertEquals(usuario.getRut(), resultado.getRut());
     }
 
+    @Test
+    void obtenerUsuarioPorId_debeLanzarExcepcion_siNoExiste() {
+        when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
 
-    private UsuarioResponse convertirAResponse(Usuario usuario){
+        assertThrows(ResourceNotFoundException.class,
+                () -> usuarioService.obtenerUsuarioPorId(99L));
+    }
 
-        return new UsuarioResponse(
-                usuario.getIdUsuario(),
-                usuario.getRut(),
-                usuario.getNombres(),
-                usuario.getApellidos(),
-                usuario.getCorreo(),
-                usuario.getTelefono(),
-                usuario.getFechaRegistro(),
-                usuario.getActivo(),
-                usuario.getTipoUsuario().getIdTipoUsuario(),
-                usuario.getTipoUsuario().getNombre(),
-                usuario.getIdSucursal()
-        );
+    // ---------- registrarUsuario ----------
+
+    @Test
+    void registrarUsuario_debeGuardarUsuario_cuandoDatosSonValidos() {
+        when(usuarioRepository.existsByRut(request.getRut())).thenReturn(false);
+        when(usuarioRepository.existsByCorreo(request.getCorreo())).thenReturn(false);
+        when(tipoUsuarioRepository.findById(1L)).thenReturn(Optional.of(tipoUsuario));
+        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
+
+        UsuarioResponse resultado = usuarioService.registrarUsuario(request);
+
+        assertNotNull(resultado);
+        assertEquals(request.getCorreo(), resultado.getCorreo());
+        verify(usuarioRepository, times(1)).save(any(Usuario.class));
+    }
+
+    @Test
+    void registrarUsuario_debeLanzarConflicto_siRutYaExiste() {
+        when(usuarioRepository.existsByRut(request.getRut())).thenReturn(true);
+
+        assertThrows(ConflictException.class,
+                () -> usuarioService.registrarUsuario(request));
+
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void registrarUsuario_debeLanzarConflicto_siCorreoYaExiste() {
+        when(usuarioRepository.existsByRut(request.getRut())).thenReturn(false);
+        when(usuarioRepository.existsByCorreo(request.getCorreo())).thenReturn(true);
+
+        assertThrows(ConflictException.class,
+                () -> usuarioService.registrarUsuario(request));
+
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void registrarUsuario_debeLanzarNotFound_siTipoUsuarioNoExiste() {
+        when(usuarioRepository.existsByRut(request.getRut())).thenReturn(false);
+        when(usuarioRepository.existsByCorreo(request.getCorreo())).thenReturn(false);
+        when(tipoUsuarioRepository.findById(request.getIdTipoUsuario())).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> usuarioService.registrarUsuario(request));
+
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    // ---------- actualizarUsuario ----------
+
+    @Test
+    void actualizarUsuario_debeActualizarDatos_cuandoUsuarioExiste() {
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.existsByRut(any())).thenReturn(false);
+        when(usuarioRepository.existsByCorreo(any())).thenReturn(false);
+        when(tipoUsuarioRepository.findById(1L)).thenReturn(Optional.of(tipoUsuario));
+        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
+
+        UsuarioResponse resultado = usuarioService.actualizarUsuario(1L, request);
+
+        assertNotNull(resultado);
+        verify(usuarioRepository, times(1)).save(usuario);
+    }
+
+    @Test
+    void actualizarUsuario_debeLanzarNotFound_siUsuarioNoExiste() {
+        when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> usuarioService.actualizarUsuario(99L, request));
+
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    // ---------- eliminarUsuario ----------
+
+    @Test
+    void eliminarUsuario_debeEliminar_siUsuarioExiste() {
+        when(usuarioRepository.existsById(1L)).thenReturn(true);
+
+        usuarioService.eliminarUsuario(1L);
+
+        verify(usuarioRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    void eliminarUsuario_debeLanzarNotFound_siUsuarioNoExiste() {
+        when(usuarioRepository.existsById(99L)).thenReturn(false);
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> usuarioService.eliminarUsuario(99L));
+
+        verify(usuarioRepository, never()).deleteById(any());
+    }
+
+    // ---------- obtenerProductoDesdeMicroservicio ----------
+
+    @Test
+    void obtenerProductoDesdeMicroservicio_debeRetornarProducto_siRespuestaEsValida() {
+        ProductoResponse productoResponse = mock(ProductoResponse.class);
+        ApiResponse<ProductoResponse> apiResponse = new ApiResponse<>(200, "OK", false, productoResponse);
+
+        when(productoClient.obtenerProductoPorId(1L)).thenReturn(apiResponse);
+
+        ProductoResponse resultado = usuarioService.obtenerProductoDesdeMicroservicio(1L);
+
+        assertEquals(productoResponse, resultado);
+    }
+
+    @Test
+    void obtenerProductoDesdeMicroservicio_debeLanzarExcepcion_siRespuestaEsError() {
+        ApiResponse<ProductoResponse> apiResponse = new ApiResponse<>(404, "No encontrado", true, null);
+
+        when(productoClient.obtenerProductoPorId(99L)).thenReturn(apiResponse);
+
+        assertThrows(RuntimeException.class,
+                () -> usuarioService.obtenerProductoDesdeMicroservicio(99L));
+    }
+
+    @Test
+    void obtenerProductoDesdeMicroservicio_debeLanzarExcepcion_siRespuestaEsNull() {
+        when(productoClient.obtenerProductoPorId(99L)).thenReturn(null);
+
+        assertThrows(RuntimeException.class,
+                () -> usuarioService.obtenerProductoDesdeMicroservicio(99L));
     }
 }
+
+
