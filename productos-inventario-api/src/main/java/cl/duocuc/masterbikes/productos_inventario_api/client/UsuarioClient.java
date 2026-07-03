@@ -15,3 +15,5 @@ public interface UsuarioClient {
     @GetMapping("/api/v1/usuarios/{idUsuario}")
     ApiResponse<UsuarioResponse> obtenerUsuarioPorId(@PathVariable Long idUsuario);
 }
+
+
