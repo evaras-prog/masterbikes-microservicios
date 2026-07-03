@@ -93,10 +93,10 @@ public class UsuarioServiceTest {
     @Test
     @DisplayName("obtenerUsuarioPorId: lanza excepción cuando no existe")
     void obtnerUsuarioPorId_cuandoNoExiste_lanzaException(){
-        //GIVEN: el repositorio no encuentra nada
+        //GIVEN
         when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
 
-        //THEN: verificamos que se lanza la excepción correcta
+        //THEN
         assertThatThrownBy(()->usuarioService.obtenerUsuarioPorId(99L))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Usuario no encontrado");
@@ -132,7 +132,7 @@ public class UsuarioServiceTest {
         //WHEN
         usuarioService.eliminarUsuario(1L);
 
-        //THEN: verificamos que deleteById fue llamado exactamente una vez
+        //THEN
         verify(usuarioRepository, times(1)).deleteById(1L);
     }
 
@@ -159,7 +159,6 @@ public class UsuarioServiceTest {
         assertThat(resultado).isNotNull();
         verify(usuarioRepository, times(1)).save(any(Usuario.class));
     }
-
 
     @Test
     @DisplayName("obtenerProductoDesdeMicroservicio: retorna producto cuando Feign responde correctamente")
