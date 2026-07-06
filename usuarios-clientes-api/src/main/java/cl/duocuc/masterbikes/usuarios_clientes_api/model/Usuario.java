@@ -52,6 +52,12 @@ public class Usuario {
     @Column(name = "direccion", length = 200)
     private String direccion;
 
+    @Column(name = "profesion", length = 200)
+    private String profesion;
+
+    @Column(name = "fecha_nacimiento")
+    private LocalDate fechaNacimiento;
+
     @ManyToOne
     @JoinColumn(name = "id_tipo", nullable = false)
     private TipoUsuario tipoUsuario;

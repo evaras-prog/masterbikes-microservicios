@@ -14,7 +14,7 @@ services:
       TNS_ADMIN: /app/wallet
     volumes:
       - ./wallet:/app/wallet:ro
-
+  
   productos-inventario-api:
     build:
       context: ./productos-inventario-api

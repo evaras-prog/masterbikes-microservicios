@@ -8,6 +8,7 @@ server:
 microservicios:
   usuarios-url: ${USUARIOS_SERVICE_URL:http://localhost:8081}
   productos-url: ${PRODUCTOS_SERVICE_URL:http://localhost:8082}
+  pagos-url: ${PAGOS_SERVICE_URL:http://localhost:8083}
 
 gateway:
   rutas:
@@ -23,6 +24,10 @@ gateway:
     - id: categorias
       uri: ${PRODUCTOS_SERVICE_URL:http://localhost:8082}
       path: /api/v1/categorias/**
+    - id: pagos
+      uri: ${PAGOS_SERVICE_URL:http://localhost:8083}
+      path: /api/v1/pagos/**
+
 
 
 

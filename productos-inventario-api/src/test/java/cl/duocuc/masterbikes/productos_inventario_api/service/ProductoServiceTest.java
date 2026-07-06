@@ -83,7 +83,7 @@ public class ProductoServiceTest {
     }
 
     @Test
-    @DisplayName("obtenerProductoPorId: retorna el producto cuando no existe")
+    @DisplayName("obtenerProductoPorId: retorna el producto cuando sí existe")
     void obtenerProductoPorId_cuandoExiste_retornaProducto(){
         //GIVEN
         when(productoRepository.findById(1L)).thenReturn(Optional.of(producto));
@@ -208,5 +208,20 @@ public class ProductoServiceTest {
         //THEN
         assertThat(resultado).isNotNull();
         assertThat(resultado.getRut()).isEqualTo("12345678K");
+    }
+
+
+    @Test
+    @DisplayName("listarProductosActivos: retorna lista de productos")
+    void listarProductosActivos_retornaSoloActivos(){
+        //GIVEN
+        when(productoRepository.findByActivo("S")).thenReturn(List.of(producto));
+
+        //WHEN
+        List<ProductoResponse> resultado = productoService.listarProductosActivos();
+
+        //THEN
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.get(0).getActivo()).isEqualTo("S");
     }
 }

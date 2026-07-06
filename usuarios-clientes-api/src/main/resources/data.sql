@@ -44,6 +44,8 @@ CREATE TABLE usuario (
                          fecha_registro  DATE NOT NULL,
                          activo          CHAR(1) NOT NULL,
                          direccion       VARCHAR2(200 CHAR),
+                         profesion       VARCHAR2(100 CHAR),
+                         fecha_nacimiento DATE,
                          id_tipo         NUMBER NOT NULL,
                          id_sucursal     NUMBER,
 

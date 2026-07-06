@@ -4,6 +4,8 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 public class UsuarioRequest {
@@ -34,6 +36,11 @@ public class UsuarioRequest {
 
     @Size(max = 200, message = "La dirección no puede superar los 200 caracteres")
     private String direccion;
+
+    @Size(max = 100, message = "La profesión no puede superar los 100 caracteres")
+    private String profesion;
+
+    private LocalDate fechaNacimiento;
 
     @Pattern(regexp = "S|N", message = "El campo activo solo permite S o N")
     private String activo;

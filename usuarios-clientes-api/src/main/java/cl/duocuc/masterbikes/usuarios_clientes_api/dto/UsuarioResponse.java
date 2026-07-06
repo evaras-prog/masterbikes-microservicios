@@ -18,7 +18,9 @@ public class UsuarioResponse {
     private String correo;
     private String telefono;
     private String direccion;
+    private String profesion;
     private LocalDate fechaRegistro;
+    private LocalDate fechaNacimiento;
     private String activo;
 
     private Long idTipoUsuario;

@@ -3,6 +3,7 @@ package cl.duocuc.masterbikes.usuarios_clientes_api.controller;
 import cl.duocuc.masterbikes.usuarios_clientes_api.dto.ApiResponse;
 import cl.duocuc.masterbikes.usuarios_clientes_api.dto.UsuarioRequest;
 import cl.duocuc.masterbikes.usuarios_clientes_api.dto.UsuarioResponse;
+import cl.duocuc.masterbikes.usuarios_clientes_api.model.Usuario;
 import cl.duocuc.masterbikes.usuarios_clientes_api.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -173,7 +174,14 @@ public class UsuarioController {
         ));
     }
 
-
+    @Operation(
+            summary = "obtener usuario por correo",
+            description = "Obtiene un usuario mediante un correo específico"
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Usuario obtenido correctamente"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+    })
     @GetMapping("/correo/{correo}")
     public ResponseEntity<ApiResponse<UsuarioResponse>> obtenerPorCorreo(@PathVariable String correo){
 
@@ -184,6 +192,48 @@ public class UsuarioController {
                 "Usuario encontrado correctamente",
                 false,
                 usuario
+        ));
+    }
+
+    @Operation(
+            summary = "obtener usuario por rut",
+            description = "Obtiene un usuario mediante un rut específico"
+    )
+    @ApiResponses(value= {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Usuario obtenido correctamente"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+    })
+    @GetMapping("/rut/{rut}")
+    public ResponseEntity<ApiResponse<UsuarioResponse>> obtenerPorRut(@PathVariable String rut){
+
+        UsuarioResponse usuario = usuarioService.obtenerPorRut(rut);
+
+        return ResponseEntity.ok(new ApiResponse<>(
+                HttpStatus.OK.value(),
+                "Usuario encontrado correctamente",
+                false,
+                usuario
+        ));
+    }
+
+    @Operation(
+            summary = "listar usuarios inactivos",
+            description = "Lista todos los usuarios que se encuentren en estado inactivo"
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Listado obtenido correctamente"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @GetMapping("/inactivos")
+    public ResponseEntity<ApiResponse<List<UsuarioResponse>>> listarUsuariosInactivos(){
+
+        List<UsuarioResponse> usuarios = usuarioService.listarUsuariosInactivos();
+
+        return ResponseEntity.ok(new ApiResponse<>(
+                HttpStatus.OK.value(),
+                "Usuarios encontrados correctamente",
+                false,
+                usuarios
         ));
     }
 }

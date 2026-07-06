@@ -22,6 +22,7 @@ import feign.FeignException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +52,7 @@ public class UsuarioService {
 
         return respuesta;
     }
+
 
     @Transactional(readOnly = true)
     public UsuarioResponse obtenerUsuarioPorId(Long id){
@@ -96,7 +98,9 @@ public class UsuarioService {
         usuario.setPassword(request.getPassword());
         usuario.setTelefono(request.getTelefono());
         usuario.setDireccion(request.getDireccion());
+        usuario.setProfesion(request.getProfesion());
         usuario.setFechaRegistro(LocalDate.now());
+        usuario.setFechaNacimiento(request.getFechaNacimiento());
         usuario.setActivo(request.getActivo() == null ? "S" : request.getActivo());
         usuario.setTipoUsuario(tipoUsuario);
         usuario.setIdSucursal(request.getIdSucursal());
@@ -143,6 +147,8 @@ public class UsuarioService {
         usuarioExistente.setPassword(request.getPassword());
         usuarioExistente.setTelefono(request.getTelefono());
         usuarioExistente.setDireccion(request.getDireccion());
+        usuarioExistente.setProfesion(request.getProfesion());
+        usuarioExistente.setFechaNacimiento(request.getFechaNacimiento());
         usuarioExistente.setActivo(request.getActivo() == null ? "S" : request.getActivo());
         usuarioExistente.setTipoUsuario(tipoUsuario);
         usuarioExistente.setIdSucursal(request.getIdSucursal());
@@ -200,6 +206,33 @@ public class UsuarioService {
         return convertirAResponse(usuario);
     }
 
+    public UsuarioResponse obtenerPorRut(String rut){
+
+        log.info("Incio de operación: buscar usuario por rut {}", rut);
+
+        Usuario usuario = usuarioRepository.findByRut(rut)
+                .orElseThrow(()->{
+                    log.warn("Usuario no encontrado con rut {}", rut);
+                    return new ResourceNotFoundException("Usuario no encontrado con rut: " + rut);
+                });
+
+        return convertirAResponse(usuario);
+    }
+
+
+    public List<UsuarioResponse> listarUsuariosInactivos(){
+
+        log.info("Inicio de operacion: listar usuarios inactivos");
+
+        List<Usuario> usuarios = usuarioRepository.findByActivo("N");
+
+        return usuarios.stream()
+                .map(this::convertirAResponse)
+                .collect(Collectors.toList());
+
+    }
+
+
 
     private UsuarioResponse convertirAResponse(Usuario usuario){
 
@@ -211,7 +244,9 @@ public class UsuarioService {
                 usuario.getCorreo(),
                 usuario.getTelefono(),
                 usuario.getDireccion(),
+                usuario.getProfesion(),
                 usuario.getFechaRegistro(),
+                usuario.getFechaNacimiento(),
                 usuario.getActivo(),
                 usuario.getTipoUsuario().getIdTipoUsuario(),
                 usuario.getTipoUsuario().getNombre(),
