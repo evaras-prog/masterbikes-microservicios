@@ -57,6 +57,18 @@ public class UsuarioService {
         log.info("Proceso exitoso: usuario encontrado con ID {}", id);
         return convertirAResponse(usuario);
     }
+    @Transactional(readOnly = true)
+    public UsuarioResponse obtenerUsuarioPorCorreo(String correo){
+        log.info("Inicio de operación: buscar usuario por correo {}", correo);
+        Usuario usuario = usuarioRepository.findByCorreo(correo)
+                .orElseThrow(()->{
+                    log.warn("Búsqueda fallida: no se encontró usuario con correo {}", correo);
+                    return new ResourceNotFoundException("Usuario no encontrado");
+                });
+        log.info("Proceso exitoso: usuario encontrado con correo {}", correo);
+        return convertirAResponse(usuario);
+    }
+
 
     public UsuarioResponse registrarUsuario(UsuarioRequest request){
         log.info("Inicio de operación: registrar usuario con RUT {}", request.getRut());

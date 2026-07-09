@@ -103,6 +103,40 @@ public class UsuarioServiceTest {
     }
 
     @Test
+    @DisplayName("obtenerUsuarioPorCorreo: retorna el usuario cuando el correo existe")
+    void obtenerUsuarioPorCorreo_cuandoExiste_retornaUsuario(){
+        //GIVEN: se configura el mock para que, al buscar ese correo, devuelva el usuario de prueba
+        when(usuarioRepository.findByCorreo("juan@test.cl")).thenReturn(Optional.of(usuario));
+
+        //WHEN
+        UsuarioResponse resultado = usuarioService.obtenerUsuarioPorCorreo("juan@test.cl");
+
+        //THEN: se valida el resultado devuelto...
+        assertThat(resultado).isNotNull();
+        assertThat(resultado.getIdUsuario()).isEqualTo(1L);
+        assertThat(resultado.getCorreo()).isEqualTo("juan@test.cl");
+        assertThat(resultado.getNombres()).isEqualTo("Juan");
+
+        //...y que el repositorio fue invocado exactamente una vez con ese correo
+        verify(usuarioRepository, times(1)).findByCorreo("juan@test.cl");
+    }
+
+    @Test
+    @DisplayName("obtenerUsuarioPorCorreo: lanza excepción cuando el correo no existe")
+    void obtenerUsuarioPorCorreo_cuandoNoExiste_lanzaException(){
+        //GIVEN: el repositorio no encuentra ningún usuario con ese correo
+        when(usuarioRepository.findByCorreo("noexiste@test.cl")).thenReturn(Optional.empty());
+
+        //THEN: se valida el tipo y mensaje de la excepción...
+        assertThatThrownBy(()->usuarioService.obtenerUsuarioPorCorreo("noexiste@test.cl"))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("Usuario no encontrado");
+
+        //...y que el repositorio sí fue consultado antes de fallar
+        verify(usuarioRepository, times(1)).findByCorreo("noexiste@test.cl");
+    }
+
+    @Test
     @DisplayName("registrarUsuario: lanza excepción cuando el rut ya existe")
     void registrarUsuario_rutDuplicado_lanzaConflictException(){
         //GIVEN
