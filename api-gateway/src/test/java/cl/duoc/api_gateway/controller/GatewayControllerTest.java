@@ -22,5 +22,7 @@ class GatewayControllerTest {
         assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
         assertThat(respuesta.getBody()).containsEntry("estado", "activo");
         assertThat(respuesta.getBody()).containsEntry("servicio", "api-gateway");
+        assertThat(respuesta.getBody()).containsEntry("version", "1.0");
+        assertThat(respuesta.getBody()).containsEntry("descripcion", "Gateway principal de Masterbikes");
     }
 }

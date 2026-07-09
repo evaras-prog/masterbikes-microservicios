@@ -20,7 +20,9 @@ public class TestController {
         return ResponseEntity.ok(Map.of(
                 "servicio", "api-gateway",
                 "estado", "activo",
-                "rutas", "usuarios, auth, productos, categorias"
+                "rutas", "usuarios, auth, productos, categorias",
+                "version", "1.0",
+                "descripcion", "Gateway principal de Masterbikes"
         ));
     }
 }
